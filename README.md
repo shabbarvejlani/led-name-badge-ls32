@@ -151,6 +151,14 @@ Maximum number of frames permitted by current code is 123.
 
 ![LED Mini Board](photos/ffmpeg_cellauto.gif)
 
+    yt-dlp https://www.youtube.com/watch?v=gkA4pRo9j0A
+    ffmpeg -i Doom\ 2\ in\ black\ \&\ white\ \[gkA4pRo9j0A\].webm -ss 17 -t 5.5  -an -filter:v "format=monow,crop=iw*9/20:y=ih*6/20:w=iw/10:h=ih*2/10,scale=h=48:w=11,transpose=dir=1,fps=21,tile=123x1" -y gfx/doom.png
+    ./led-badge-11x44.py -m 5 -s 8 :gfx/doom.png:
+
+plays a doom game video.
+
+![LED Mini Board](photos/doom.gif)
+
     python3 ./led-badge-11x44.py --list-names
 
 prints the list of builtin icon names, including :happy: :happy2: :heart: :HEART: :heart2: :HEART2: :fablab: :bicycle: :bicycle_r: :owncloud: ::
