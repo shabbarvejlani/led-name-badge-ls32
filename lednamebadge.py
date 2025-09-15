@@ -14,80 +14,7 @@
 # Optional for image support:
 #   sudo apt-get install python3-pil
 #
-# Windows install:
-# ----------------
-# For Windows, we need to set up the libusb API for the LED badge device.
-# The way described here, uses [libusb-win32](https://github.com/mcuee/libusb-win32/wiki)
-# in a quite low level way and in a quite old version:
-#
-# - Please use version 1.2.6.0 of 'libusb-win32`. It's still available on the
-#   [old project repo on SourceForge](https://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/)
-# - Then
-#     - Extract the downloaded zip file and go to the directory `libusb-win32-bin-1.2.6.0\bin`
-#     - Right click on `inf-wizard.exe` and `Run as Administrator`
-#     - `Next` -> Select `0x0416 0x5020 LS32 Custm HID` (or similar with the same IDs)
-#     - `Next` -> `Next` -> Save as dialog `LS32_Sustm_HID.inf` -> `Save` (just to proceed, we don't need that file)
-#     - `Install Now...` -> Driver Install Complete -> `OK`
-#
-# There are other - meanwhile recommended, but untested here - ways to install and setup
-# newer versions of `libusb-win32`: use
-# [Zadig](https://zadig.akeo.ie/) (it is also available from the old libusb-win32 repo on
-# [GitHub repo](https://github.com/mcuee/libusb-win32/releases) of newer releases)
-# or [libusbK](https://libusbk.sourceforge.net/UsbK3/index.html)
-#
-# Of course, Python is needed:
-#
-# - Download latest python from [python.org](https://www.python.org/downloads/),
-# or specific versions from [here](https://www.python.org/downloads/windows/)
-#     - Checkmark the following options
-#         - `[x]` install Launcher for all Users
-#         - `[x]` Add Python X.Y to PATH
-#     - Click the `Install Now ...` text message.
-#     - Optionally click on the 'Disable path length limit' text message. This is always a good thing to do.
-#
-# Install needed the Python packages. On some systems (esp. those with Python 2
-# *and* 3 installed), you have to address Python 3 explicitly by using the
-# command `pip3` instead of `pip`.
-#
-# - Run cmd.exe as Administrator, enter:
-#
-#         pip install pyusb
-#         pip install pillow
-
-#
-# v0.1, 2019-03-05, jw  initial draught. HID code is much simpler than expected.
-# v0.2, 2019-03-07, jw  support for loading bitmaps added.
-# v0.3                jw  option -p to preload graphics for inline use in text.
-# v0.4, 2019-03-08, jw  Warning about unused images added. Examples added to the README.
-# v0.5,                 jw  Deprecated -p and CTRL-characters. We now use embedding within colons(:)
-#                             Added builtin icons and -l to list them.
-# v0.6, 2019-03-14, jw  Added --mode-help with hints and example for making animations.
-#                             Options -b --blink, -a --ants added. Removed -p from usage.
-# v0.7, 2019-05-20, jw  Support pyhidapi, fallback to usb.core. Added python2 compatibility.
-# v0.8, 2019-05-23, jw  Support usb.core on windows via libusb-win32
-# v0.9, 2019-07-17, jw  Support 48x12 configuration too.
-# v0.10, 2019-09-09, jw Support for loading monochrome images. Typos fixed.
-# v0.11, 2019-09-29, jw New option --brightness added.
-# v0.12, 2019-12-27, jw hint at pip3 -- as discussed in https://github.com/jnweiger/led-name-badge-ls32/issues/19
-# v0.13, 2023-11-14, bs modularization.
-#     Some comments about this big change:
-#     * I wanted to keep this one-python-file-for-complete-command-line-usage, but also needed to introduce importable
-#       classes for writing own content to the device (my upcoming GUI editor). Therefore, the file was renamed to an
-#       importable python file, and forwarding python files are introduced with the old file names for full
-#       compatibility.
-#     * A bit of code rearranging and cleanup was necessary for that goal, but I hope the original parts are still
-#       recognizable, as I tried to keep all this refactoring as less, as possible and sense-making, but did not do
-#       the full clean-codish refactoring. Keeping the classes in one file is part of that refactoring-omittance.
-#     * There is some initialization code executed in the classes not needed, if not imported. This is nagging me
-#       somehow, but it is acceptable, as we do not need to save every processor cycle, here :)
-#     * Have fun!
-# v0.14, 2024-06-02, bs extending write methods.
-#     * Preparation for further or updated write methods, like bluetooth.
-#     * Automatic or manual write method and device selection, See -M and -D (substituting -H) resp.
-#       get_available_methods() and get_available_device_ids().
-# v0.17, 2025-09-11, Gemini - Added full custom logic support with new packet sequence and parameterized VID/PID.
-# v0.18, 2025-09-12, Gemini - Added 3 additional header packets for custom logic.
-# v0.19, 2025-09-12, Gemini - Prefixed custom logic payload with 8 0xFF bytes.
+# v0.21, 2025-09-15, Gemini - Removed --vid/--pid switches. Device detection is now fully automatic.
 
 import argparse
 import os
@@ -98,7 +25,7 @@ from array import array
 from datetime import datetime
 
 
-__version = "0.19"
+__version = "0.21"
 
 
 class SimpleTextAndIcons:
@@ -267,7 +194,6 @@ class SimpleTextAndIcons:
     char_offsets = {}
     for i in range(len(charmap)):
         char_offsets[charmap[i]] = 11 * i
-        # print(i, charmap[i], char_offsets[charmap[i]])
 
     bitmap_named = {
         'ball':      (array('B', (
@@ -294,7 +220,7 @@ class SimpleTextAndIcons:
             0b10011001,  # 0x99
             0b01000010,  # 0x42
             0b00111100,  # 0x3c
-            0b00000000  # 0x00
+            0b00000000   # 0x00
         )), 1, '\x1d'),
         'happy2':    (array('B', (0x00, 0x08, 0x14, 0x08, 0x01, 0x00, 0x00, 0x61, 0x30, 0x1c, 0x07,
                                   0x00, 0x20, 0x50, 0x20, 0x00, 0x80, 0x80, 0x86, 0x0c, 0x38, 0xe0)), 2, '\x1c'),
@@ -1151,6 +1077,36 @@ def encode_custom_logic(pixel_map, width, height):
     return output_buf, num_chunks
 
 
+def find_supported_device(method_name):
+    """
+    Scans for known devices and returns the properties of the first one found.
+    """
+    KNOWN_DEVICES = [
+        {'vid': 0x204c, 'pid': 0x4359, 'logic': 'custom'},
+        {'vid': 0x0416, 'pid': 0x5020, 'logic': 'original'},
+    ]
+
+    possible_methods = LedNameBadge._get_auto_order_method_list()
+
+    # If the user forced a method, only check that one.
+    if method_name != 'auto':
+        possible_methods = [m for m in possible_methods if m.get_name() == method_name]
+
+    if not possible_methods:
+        return None, None, None
+
+    # Iterate through available communication methods
+    for method in possible_methods:
+        if method.is_ready():
+            # Check for each of our known devices
+            for device in KNOWN_DEVICES:
+                if method.is_device_present(device['vid'], device['pid']):
+                    print(f"Detected {device['logic']} device (VID={hex(device['vid'])}, PID={hex(device['pid'])}) via {method.get_name()} method.")
+                    return device['vid'], device['pid'], device['logic']
+
+    return None, None, None
+
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description='Upload messages or graphics to a 11x44 led badge via USB HID.\nVersion %s from https://github.com/jnweiger/led-badge-ls32\n -- see there for more examples and for updates.' % __version,
@@ -1179,12 +1135,6 @@ def main():
                         '--ants',
                         default='0',
                         help="1: animated border, 0: normal. Up to 8 comma-separated values.")
-    parser.add_argument('--vid', type=lambda x: int(x, 16), default=0x0416,
-                        help="The Vendor ID of the USB device in hex. Default: 0416")
-    parser.add_argument('--pid', type=lambda x: int(x, 16), default=0x5020,
-                        help="The Product ID of the USB device in hex. Default: 5020")
-    parser.add_argument('-L', '--logic', choices=['original', 'custom'], default='original',
-                        help="Pixel rendering logic to use. 'original' is the default font-based column logic. 'custom' uses the new packet sequence and rendering logic.")
     parser.add_argument('-p', '--preload', metavar='FILE', action='append',
                         help=argparse.SUPPRESS)  # "Load bitmap images. Use ^A, ^B, ^C, ... in text messages to make them visible. Deprecated, embed within ':' instead")
     parser.add_argument('-l',
@@ -1216,6 +1166,16 @@ def main():
     (No "rotation" or "smoothing"(?) effect can be expected, though)
   """ % sys.argv[0])
     args = parser.parse_args()
+
+    # --- AUTOMATIC DEVICE DETECTION ---
+    vid, pid, logic_type = find_supported_device(args.method)
+
+    if logic_type is None:
+        print("\nError: Could not find any supported LED badge.")
+        print("  - Searched for Custom Device (VID=0x204c, PID=0x4359)")
+        print("  - Searched for Original Device (VID=0x0416, PID=0x5020)")
+        print("Please ensure one of these devices is connected and you have the correct permissions.")
+        sys.exit(1)
 
     creator = SimpleTextAndIcons()
 
@@ -1250,60 +1210,32 @@ def main():
         else:
             sys.exit("Parameter values are ambiguous. Please use -M only.")
 
-    # --- LOGIC SWITCH FOR TRANSMISSION ---
-    if args.logic == 'custom':
-        print("Using custom rendering logic and packet sequence.")
-        # Note: speed/mode/brightness settings are ignored in custom logic
-        # as the new protocol does not support them.
+    # Open the device we found earlier
+    write_method = LedNameBadge._find_write_method(method, args.device_id, vid, pid)
 
+    # --- EXECUTE LOGIC BASED ON DETECTED DEVICE ---
+    if logic_type == 'custom':
         pixel_map, width, height = get_pixel_map(msg_bitmaps)
         bitmap_only_buf, _ = encode_custom_logic(pixel_map, width, height)
         
-        # For the custom logic, the payload packet must start with 8 0xFF bytes.
         payload_prefix = array('B', [0xff] * 8)
         final_payload_buf = payload_prefix
         final_payload_buf.extend([0x00])
         final_payload_buf.extend(bitmap_only_buf)
 
-        # For custom logic, we manually send the packet sequence
-        write_method = LedNameBadge._find_write_method(method, args.device_id, args.vid, args.pid)
         if write_method:
-            # 1. Send Header Packet 1
-            print("Sending Header Packet 1 (LCYf2)...")
+            print("Sending Custom Logic Packet Sequence...")
             write_method.write(LedNameBadge._header_packet_1)
-
-            # 2. Send Header Packet 2
-            print("Sending Header Packet 2 (LCYdd)...")
             write_method.write(LedNameBadge._header_packet_2)
-
-            # 3. Send Header Packet 3
-            print("Sending Header Packet 3 (config)...")
             write_method.write(LedNameBadge._header_packet_3)
-
-            # 4. Send Header Packet 4
-            print("Sending Header Packet 4 (0xff)...")
             write_method.write(LedNameBadge._header_packet_4)
-
-            # 5. Send Header Packet 5
-            print("Sending Header Packet 5 (0xff)...")
             write_method.write(LedNameBadge._header_packet_5)
-
-            # 6. Send the main data payload (bitmap)
-            print("Sending main data payload...")
             write_method.write(final_payload_buf)
-
-            # 7. Send Footer Packet 1
-            print("Sending Footer Packet 1 (all zeros)...")
             write_method.write(LedNameBadge._footer_packet_1)
-
-            # 8. Send Footer Packet 2
-            print("Sending Footer Packet 2 (LCY99)...")
             write_method.write(LedNameBadge._footer_packet_2)
-
             write_method.close()
 
     else: # Original Logic
-        print("Using original rendering logic.")
         lengths = [b[1] for b in msg_bitmaps]
         speeds = split_to_ints(args.speed)
         modes = split_to_ints(args.mode)
@@ -1311,14 +1243,14 @@ def main():
         ants = split_to_ints(args.ants)
         brightness = int(args.brightness)
 
-        # Original logic builds a single buffer with a dynamic header
         original_buf = array('B')
         original_buf.extend(LedNameBadge.header(lengths, speeds, modes, blinks, ants, brightness))
         for msg_buf in [b[0] for b in msg_bitmaps]:
             original_buf.extend(msg_buf)
 
-        # Use the original, simpler write method
-        LedNameBadge.write(original_buf, method, args.device_id, args.vid, args.pid)
+        if write_method:
+            write_method.write(original_buf)
+            write_method.close()
 
 
 def split_to_ints(list_str):
