@@ -9,8 +9,9 @@ class Test(abstract_write_method_test.AbstractWriteMethodTest):
         methods, output = self.call_info_methods()
         self.assertDictEqual({
             'hidapi': ('Program a device connected via USB using the pyhidapi package and libhidapi.', True),
-            'libusb': ('Program a device connected via USB using the pyusb package and libusb.', True)},
-            methods)
+            'libusb': ('Program a device connected via USB using the pyusb package and libusb.', True),
+            'pyserial': ('Program a device with the open-source firmware, connected via USB, using the pyserial package.', False)
+        }, methods)
 
     def test_get_device_ids(self):
         device_ids, output = self.call_info_ids('libusb')
@@ -48,7 +49,7 @@ class Test(abstract_write_method_test.AbstractWriteMethodTest):
     def call_info_ids(self, method):
         self.print_test_conditions(True, True, True, '-', '-')
         method_obj, output, _ = self.prepare_modules(True, True, True,
-                                                     lambda m: m.get_available_device_ids(method))
+                                                     lambda m: m.get_available_device_ids(method,vid=0x0416, pid=0x5020))
         return method_obj, output
 
     def call_write(self, method):
