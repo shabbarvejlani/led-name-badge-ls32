@@ -56,12 +56,12 @@
 #
 # v0.1, 2019-03-05, jw  initial draught. HID code is much simpler than expected.
 # v0.2, 2019-03-07, jw  support for loading bitmaps added.
-# v0.3              jw  option -p to preload graphics for inline use in text.
+# v0.3                jw  option -p to preload graphics for inline use in text.
 # v0.4, 2019-03-08, jw  Warning about unused images added. Examples added to the README.
-# v0.5,             jw  Deprecated -p and CTRL-characters. We now use embedding within colons(:)
-#                       Added builtin icons and -l to list them.
+# v0.5,                 jw  Deprecated -p and CTRL-characters. We now use embedding within colons(:)
+#                             Added builtin icons and -l to list them.
 # v0.6, 2019-03-14, jw  Added --mode-help with hints and example for making animations.
-#                       Options -b --blink, -a --ants added. Removed -p from usage.
+#                             Options -b --blink, -a --ants added. Removed -p from usage.
 # v0.7, 2019-05-20, jw  Support pyhidapi, fallback to usb.core. Added python2 compatibility.
 # v0.8, 2019-05-23, jw  Support usb.core on windows via libusb-win32
 # v0.9, 2019-07-17, jw  Support 48x12 configuration too.
@@ -264,6 +264,7 @@ class SimpleTextAndIcons:
     char_offsets = {}
     for i in range(len(charmap)):
         char_offsets[charmap[i]] = 11 * i
+        # print(i, charmap[i], char_offsets[charmap[i]])
 
     bitmap_named = {
         'ball':      (array('B', (
@@ -290,7 +291,7 @@ class SimpleTextAndIcons:
             0b10011001,  # 0x99
             0b01000010,  # 0x42
             0b00111100,  # 0x3c
-            0b00000000   # 0x00
+            0b00000000  # 0x00
         )), 1, '\x1d'),
         'happy2':    (array('B', (0x00, 0x08, 0x14, 0x08, 0x01, 0x00, 0x00, 0x61, 0x30, 0x1c, 0x07,
                                   0x00, 0x20, 0x50, 0x20, 0x00, 0x80, 0x80, 0x86, 0x0c, 0x38, 0xe0)), 2, '\x1c'),

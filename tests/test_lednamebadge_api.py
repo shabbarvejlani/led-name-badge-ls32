@@ -8,18 +8,9 @@ class Test(abstract_write_method_test.AbstractWriteMethodTest):
     def test_get_methods(self):
         methods, output = self.call_info_methods()
         self.assertDictEqual({
-            'hidapi': (
-                'Program a device connected via USB using the pyhidapi package and libhidapi.',
-                True
-            ),
-            'libusb': (
-                'Program a device connected via USB using the pyusb package and libusb.',
-                True
-            ),
-            'pyserial': (
-                'Program a device with the open-source firmware, connected via USB, using the pyserial package.',
-                False  # The mock setup for this test has pyserial as not ready.
-            )
+            'hidapi': ('Program a device connected via USB using the pyhidapi package and libhidapi.', True),
+            'libusb': ('Program a device connected via USB using the pyusb package and libusb.', True),
+            'pyserial': ('Program a device with the open-source firmware, connected via USB, using the pyserial package.', False)
         }, methods)
 
     def test_get_device_ids(self):
