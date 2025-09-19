@@ -95,7 +95,7 @@ from array import array
 from datetime import datetime
 
 
-__version = "0.21"
+__version = "0.15"
 
 
 class SimpleTextAndIcons:
