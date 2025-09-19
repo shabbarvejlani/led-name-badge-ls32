@@ -14,6 +14,76 @@
 # Optional for image support:
 #   sudo apt-get install python3-pil
 #
+# Windows install:
+# ----------------
+# For Windows, we need to set up the libusb API for the LED badge device.
+# The way described here, uses [libusb-win32](https://github.com/mcuee/libusb-win32/wiki)
+# in a quite low level way and in a quite old version:
+#
+# - Please use version 1.2.6.0 of 'libusb-win32`. It's still available on the
+#   [old project repo on SourceForge](https://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/)
+# - Then
+#     - Extract the downloaded zip file and go to the directory `libusb-win32-bin-1.2.6.0\bin`
+#     - Right click on `inf-wizard.exe` and `Run as Administrator`
+#     - `Next` -> Select `0x0416 0x5020 LS32 Custm HID` (or similar with the same IDs)
+#     - `Next` -> `Next` -> Save as dialog `LS32_Sustm_HID.inf` -> `Save` (just to proceed, we don't need that file)
+#     - `Install Now...` -> Driver Install Complete -> `OK`
+#
+# There are other - meanwhile recommended, but untested here - ways to install and setup
+# newer versions of `libusb-win32`: use
+# [Zadig](https://zadig.akeo.ie/) (it is also available from the old libusb-win32 repo on
+# [GitHub repo](https://github.com/mcuee/libusb-win32/releases) of newer releases)
+# or [libusbK](https://libusbk.sourceforge.net/UsbK3/index.html)
+#
+# Of course, Python is needed:
+#
+# - Download latest python from [python.org](https://www.python.org/downloads/),
+# or specific versions from [here](https://www.python.org/downloads/windows/)
+#     - Checkmark the following options
+#         - `[x]` install Launcher for all Users
+#         - `[x]` Add Python X.Y to PATH
+#     - Click the `Install Now ...` text message.
+#     - Optionally click on the 'Disable path length limit' text message. This is always a good thing to do.
+#
+# Install needed the Python packages. On some systems (esp. those with Python 2
+# *and* 3 installed), you have to address Python 3 explicitly by using the
+# command `pip3` instead of `pip`.
+#
+# - Run cmd.exe as Administrator, enter:
+#
+#         pip install pyusb
+#         pip install pillow
+#
+# v0.1, 2019-03-05, jw  initial draught. HID code is much simpler than expected.
+# v0.2, 2019-03-07, jw  support for loading bitmaps added.
+# v0.3              jw  option -p to preload graphics for inline use in text.
+# v0.4, 2019-03-08, jw  Warning about unused images added. Examples added to the README.
+# v0.5,             jw  Deprecated -p and CTRL-characters. We now use embedding within colons(:)
+#                       Added builtin icons and -l to list them.
+# v0.6, 2019-03-14, jw  Added --mode-help with hints and example for making animations.
+#                       Options -b --blink, -a --ants added. Removed -p from usage.
+# v0.7, 2019-05-20, jw  Support pyhidapi, fallback to usb.core. Added python2 compatibility.
+# v0.8, 2019-05-23, jw  Support usb.core on windows via libusb-win32
+# v0.9, 2019-07-17, jw  Support 48x12 configuration too.
+# v0.10, 2019-09-09, jw Support for loading monochrome images. Typos fixed.
+# v0.11, 2019-09-29, jw New option --brightness added.
+# v0.12, 2019-12-27, jw hint at pip3 -- as discussed in https://github.com/jnweiger/led-name-badge-ls32/issues/19
+# v0.13, 2023-11-14, bs modularization.
+#     Some comments about this big change:
+#     * I wanted to keep this one-python-file-for-complete-command-line-usage, but also needed to introduce importable
+#       classes for writing own content to the device (my upcoming GUI editor). Therefore, the file was renamed to an
+#       importable python file, and forwarding python files are introduced with the old file names for full
+#       compatibility.
+#     * A bit of code rearranging and cleanup was necessary for that goal, but I hope the original parts are still
+#       recognizable, as I tried to keep all this refactoring as less, as possible and sense-making, but did not do
+#       the full clean-codish refactoring. Keeping the classes in one file is part of that refactoring-omittance.
+#     * There is some initialization code executed in the classes not needed, if not imported. This is nagging me
+#       somehow, but it is acceptable, as we do not need to save every processor cycle, here :)
+#     * Have fun!
+# v0.14, 2024-06-02, bs extending write methods.
+#     * Preparation for further or updated write methods, like bluetooth.
+#     * Automatic or manual write method and device selection, See -M and -D (substituting -H) resp.
+#       get_available_methods() and get_available_device_ids().
 # v0.21, 2025-09-15, Gemini - Removed --vid/--pid switches. Device detection is now fully automatic.
 
 import argparse
