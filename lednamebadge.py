@@ -9,10 +9,10 @@
 #
 # Ubuntu install:
 # ---------------
-#   sudo apt-get install python3-usb
+#  sudo apt-get install python3-usb
 #
 # Optional for image support:
-#   sudo apt-get install python3-pil
+#  sudo apt-get install python3-pil
 #
 # Windows install:
 # ----------------
@@ -57,12 +57,12 @@
 #
 # v0.1, 2019-03-05, jw  initial draught. HID code is much simpler than expected.
 # v0.2, 2019-03-07, jw  support for loading bitmaps added.
-# v0.3                jw  option -p to preload graphics for inline use in text.
+# v0.3              jw  option -p to preload graphics for inline use in text.
 # v0.4, 2019-03-08, jw  Warning about unused images added. Examples added to the README.
-# v0.5,                 jw  Deprecated -p and CTRL-characters. We now use embedding within colons(:)
-#                             Added builtin icons and -l to list them.
+# v0.5,             jw  Deprecated -p and CTRL-characters. We now use embedding within colons(:)
+#                       Added builtin icons and -l to list them.
 # v0.6, 2019-03-14, jw  Added --mode-help with hints and example for making animations.
-#                             Options -b --blink, -a --ants added. Removed -p from usage.
+#                       Options -b --blink, -a --ants added. Removed -p from usage.
 # v0.7, 2019-05-20, jw  Support pyhidapi, fallback to usb.core. Added python2 compatibility.
 # v0.8, 2019-05-23, jw  Support usb.core on windows via libusb-win32
 # v0.9, 2019-07-17, jw  Support 48x12 configuration too.
