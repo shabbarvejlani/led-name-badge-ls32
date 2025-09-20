@@ -53,6 +53,7 @@
 #
 #         pip install pyusb
 #         pip install pillow
+
 #
 # v0.1, 2019-03-05, jw  initial draught. HID code is much simpler than expected.
 # v0.2, 2019-03-07, jw  support for loading bitmaps added.
@@ -84,7 +85,7 @@
 #     * Preparation for further or updated write methods, like bluetooth.
 #     * Automatic or manual write method and device selection, See -M and -D (substituting -H) resp.
 #       get_available_methods() and get_available_device_ids().
-# v0.21, 2025-09-15, Gemini - Removed --vid/--pid switches. Device detection is now fully automatic.
+# v0.15, 2025-09-15, Removed --vid/--pid switches. Device detection is now fully automatic.
 
 import argparse
 import os
@@ -254,12 +255,12 @@ class SimpleTextAndIcons:
     )
 
     charmap = u'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + \
-        u'abcdefghijklmnopqrstuvwxyz' + \
-        u'0987654321^ !"\0$%&/()=?` °\\}][{' + \
-        u"@ ~ |<>,;.:-_#'+* " + \
-        u"äöüÄÖÜß" + \
-        u"àäòöùüèéêëôöûîïÿç" + \
-        u"ÀÅÄÉÈÊËÖÔÜÛÙŸ"
+              u'abcdefghijklmnopqrstuvwxyz' + \
+              u'0987654321^ !"\0$%&/()=?` °\\}][{' + \
+              u"@ ~ |<>,;.:-_#'+* " + \
+              u"äöüÄÖÜß" + \
+              u"àäòöùüèéêëôöûîïÿç" + \
+              u"ÀÅÄÉÈÊËÖÔÜÛÙŸ"
 
     char_offsets = {}
     for i in range(len(charmap)):
@@ -352,12 +353,12 @@ class SimpleTextAndIcons:
 
     def bitmap_text(self, text):
         """Returns a tuple of (buffer, length_in_byte_columns_aka_chars)
-            We preprocess the text string for substitution patterns
-            "::" is replaced with a single ":"
-            ":1: is replaced with CTRL-A referencing the first preloaded or loaded image.
-            ":happy:" is replaced with a reference to a builtin smiley glyph
-            ":heart:" is replaced with a reference to a builtin heart glyph
-            ":gfx/logo.png:" preloads the file gfx/logo.png and is replaced the corresponding control char.
+          We preprocess the text string for substitution patterns
+          "::" is replaced with a single ":"
+          ":1: is replaced with CTRL-A referencing the first preloaded or loaded image.
+          ":happy:" is replaced with a reference to a builtin smiley glyph
+          ":heart:" is replaced with a reference to a builtin heart glyph
+          ":gfx/logo.png:" preloads the file gfx/logo.png and is replaced the corresponding control char.
         """
 
         def replace_symbolic(m):
@@ -1216,26 +1217,26 @@ def main():
     parser.add_argument('message', metavar='MESSAGE', nargs='+',
                         help="Up to 8 message texts with embedded builtin icons or loaded images within colons(:) -- See -l for a list of builtins.")
     parser.add_argument('--mode-help', action='version', help=argparse.SUPPRESS, version="""
-
-  -m 5 "Animation"
-
-    Animation frames are 6 character (or 48px) wide. Upload an animation of
-    N frames as one image N*48 pixels wide, 11 pixels high.
-    Frames run from left to right and repeat endless.
-    Speeds [1..8] result in ca. [1.2 1.3 2.0 2.4 2.8 4.5 7.5 15] fps.
-
-    Example of a slowly beating heart:
-    sudo %s -s1 -m5 "  :heart2:   :HEART2:"
-
-  -m 9 "Smooth"
-  -m 10 "Rotate"
-
-    These modes are mentioned in the BMP Badge software.
-    Text is shown static, or sometimes (longer texts?) not shown at all.
-    One significant difference is: The text of the first message stays visible after
-    upload, even if the USB cable remains connected.
-    (No "rotation" or "smoothing"(?) effect can be expected, though)
-  """ % sys.argv[0])
+    
+    -m 5 "Animation"
+    
+     Animation frames are 6 character (or 48px) wide. Upload an animation of
+     N frames as one image N*48 pixels wide, 11 pixels high.
+     Frames run from left to right and repeat endless.
+     Speeds [1..8] result in ca. [1.2 1.3 2.0 2.4 2.8 4.5 7.5 15] fps.
+    
+     Example of a slowly beating heart:
+      sudo %s -s1 -m5 "  :heart2:    :HEART2:"
+    
+    -m 9 "Smooth"
+    -m 10 "Rotate"
+    
+     These modes are mentioned in the BMP Badge software.
+     Text is shown static, or sometimes (longer texts?) not shown at all.
+     One significant difference is: The text of the first message stays visible after
+     upload, even if the USB cable remains connected.
+     (No "rotation" or "smoothing"(?) effect can be expected, though)
+    """ % sys.argv[0])
     args = parser.parse_args()
 
     # --- AUTOMATIC DEVICE DETECTION ---
